@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Job, Company } from "@/lib/types";
@@ -218,24 +217,22 @@ const JobDetail = () => {
                 </div>
               </div>
 
-              <div className="mt-8 space-y-4">
-                <Link to={`/company/${company.id}`}>
-                  <Button 
-                    variant="secondary" 
-                    className="w-full bg-gray-50 hover:bg-gray-100 text-gray-800 font-medium h-11"
+              <div className="mt-10 space-y-6">
+                <Link to={`/company/${company.id}`} className="block">
+                  <button 
+                    className="w-full py-3 px-4 bg-gray-50 hover:bg-gray-100 text-gray-800 font-medium rounded-md transition-colors"
                   >
                     View Company Profile
-                  </Button>
+                  </button>
                 </Link>
                 
-                <a href={company.website} target="_blank" rel="noopener noreferrer">
-                  <Button 
-                    variant="secondary" 
-                    className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium h-11"
+                <a href={company.website} target="_blank" rel="noopener noreferrer" className="block">
+                  <button 
+                    className="w-full py-3 px-4 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium rounded-md transition-colors flex items-center justify-center"
                   >
                     Visit Website
                     <ExternalLink className="ml-2 h-4 w-4" />
-                  </Button>
+                  </button>
                 </a>
               </div>
             </div>
@@ -243,20 +240,18 @@ const JobDetail = () => {
             <div className="bg-white rounded-xl shadow-sm border border-border/50 p-6">
               <h2 className="text-xl font-semibold tracking-tight mb-4">Share This Job</h2>
               <div className="flex gap-3">
-                <Button 
-                  variant="secondary" 
-                  className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-800"
+                <button 
+                  className="flex-1 py-2 px-4 bg-gray-50 hover:bg-gray-100 text-gray-800 rounded-md transition-colors flex items-center justify-center"
                 >
                   <Share2 className="mr-2 h-4 w-4" />
                   Share
-                </Button>
-                <Button 
-                  variant="secondary" 
-                  className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-800"
+                </button>
+                <button 
+                  className="flex-1 py-2 px-4 bg-gray-50 hover:bg-gray-100 text-gray-800 rounded-md transition-colors flex items-center justify-center"
                 >
                   <Bookmark className="mr-2 h-4 w-4" />
                   Save
-                </Button>
+                </button>
               </div>
             </div>
           </div>
