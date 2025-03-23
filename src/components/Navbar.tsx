@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const Navbar = () => {
@@ -19,13 +19,22 @@ const Navbar = () => {
     checkAuth();
     
     const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
-      setIsLoggedIn(event === 'SIGNED_IN');
+      setIsLoggedIn(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED');
     });
     
     return () => {
       authListener.subscription.unsubscribe();
     };
   }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -79,7 +88,13 @@ const Navbar = () => {
         {/* Desktop buttons */}
         <div className="ml-4 hidden md:flex items-center gap-2">
           {isLoggedIn ? (
-            <Button size="sm" onClick={() => navigate("/dashboard")}>Dashboard</Button>
+            <>
+              <Button size="sm" onClick={() => navigate("/dashboard")}>Dashboard</Button>
+              <Button variant="outline" size="sm" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
+            </>
           ) : (
             <>
               <Button variant="outline" size="sm" asChild>
@@ -116,16 +131,30 @@ const Navbar = () => {
 
             <div className="flex flex-col gap-2 mt-2">
               {isLoggedIn ? (
-                <Button 
-                  size="sm" 
-                  className="w-full"
-                  onClick={() => {
-                    navigate("/dashboard");
-                    setIsMenuOpen(false);
-                  }}
-                >
-                  Dashboard
-                </Button>
+                <>
+                  <Button 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => {
+                      navigate("/dashboard");
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Dashboard
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => {
+                      handleSignOut();
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </>
               ) : (
                 <>
                   <Button 
