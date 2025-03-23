@@ -172,86 +172,92 @@ const JobDetail = () => {
             </div>
           </div>
 
-          <div>
-            <div className="bg-white rounded-xl shadow-sm border border-border/50 p-6 mb-6 sticky top-24">
-              <h2 className="text-xl font-semibold tracking-tight mb-6">About {company.name}</h2>
+          <div className="relative">
+            <div className="sticky top-24 space-y-6">
+              <div className="bg-white rounded-xl shadow-sm border border-border/50 p-6">
+                <h2 className="text-xl font-semibold tracking-tight mb-6">About {company.name}</h2>
 
-              <div className="flex justify-center mb-6">
-                <div className="h-24 w-24 rounded-xl overflow-hidden bg-gray-50 p-3 border border-border/50">
-                  <img 
-                    src={company.logo} 
-                    alt={`${company.name} logo`} 
-                    className="h-full w-full object-contain"
-                  />
+                <div className="flex justify-center mb-6">
+                  <div className="h-24 w-24 rounded-xl overflow-hidden bg-gray-50 p-3 border border-border/50">
+                    <img 
+                      src={company.logo} 
+                      alt={`${company.name} logo`} 
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
+                </div>
+
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  {company.description.length > 150 
+                    ? `${company.description.substring(0, 150)}...` 
+                    : company.description}
+                </p>
+
+                <Separator className="my-6" />
+
+                <div className="space-y-4 text-sm">
+                  <div className="flex items-center gap-3">
+                    <BriefcaseBusiness className="h-4 w-4 text-primary" />
+                    <span className="text-muted-foreground">Industry</span>
+                    <span className="font-medium ml-auto">{company.industry}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Users className="h-4 w-4 text-primary" />
+                    <span className="text-muted-foreground">Company size</span>
+                    <span className="font-medium ml-auto">{company.size}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Clock className="h-4 w-4 text-primary" />
+                    <span className="text-muted-foreground">Founded</span>
+                    <span className="font-medium ml-auto">{company.founded}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <MapPin className="h-4 w-4 text-primary" />
+                    <span className="text-muted-foreground">Headquarters</span>
+                    <span className="font-medium ml-auto">{company.headquarters}</span>
+                  </div>
+                </div>
+
+                <div className="pt-10">
+                  <div className="mb-6">
+                    <Link to={`/company/${company.id}`} className="block w-full">
+                      <Button 
+                        className="w-full bg-gray-50 hover:bg-gray-100 text-gray-800 font-medium h-12"
+                      >
+                        View Company Profile
+                      </Button>
+                    </Link>
+                  </div>
+                  
+                  <div>
+                    <a href={company.website} target="_blank" rel="noopener noreferrer" className="block w-full">
+                      <Button 
+                        className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium h-12"
+                      >
+                        Visit Website
+                        <ExternalLink className="ml-2 h-4 w-4" />
+                      </Button>
+                    </a>
+                  </div>
                 </div>
               </div>
 
-              <p className="text-muted-foreground mb-6 leading-relaxed">
-                {company.description.length > 150 
-                  ? `${company.description.substring(0, 150)}...` 
-                  : company.description}
-              </p>
-
-              <Separator className="my-6" />
-
-              <div className="space-y-4 text-sm">
-                <div className="flex items-center gap-3">
-                  <BriefcaseBusiness className="h-4 w-4 text-primary" />
-                  <span className="text-muted-foreground">Industry</span>
-                  <span className="font-medium ml-auto">{company.industry}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Users className="h-4 w-4 text-primary" />
-                  <span className="text-muted-foreground">Company size</span>
-                  <span className="font-medium ml-auto">{company.size}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Clock className="h-4 w-4 text-primary" />
-                  <span className="text-muted-foreground">Founded</span>
-                  <span className="font-medium ml-auto">{company.founded}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <MapPin className="h-4 w-4 text-primary" />
-                  <span className="text-muted-foreground">Headquarters</span>
-                  <span className="font-medium ml-auto">{company.headquarters}</span>
-                </div>
-              </div>
-
-              <div className="mt-10 space-y-6">
-                <Link to={`/company/${company.id}`} className="block">
-                  <button 
-                    className="w-full py-3 px-4 bg-gray-50 hover:bg-gray-100 text-gray-800 font-medium rounded-md transition-colors"
+              <div className="bg-white rounded-xl shadow-sm border border-border/50 p-6">
+                <h2 className="text-xl font-semibold tracking-tight mb-4">Share This Job</h2>
+                <div className="flex gap-3">
+                  <Button 
+                    className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-800"
                   >
-                    View Company Profile
-                  </button>
-                </Link>
-                
-                <a href={company.website} target="_blank" rel="noopener noreferrer" className="block">
-                  <button 
-                    className="w-full py-3 px-4 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium rounded-md transition-colors flex items-center justify-center"
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Share
+                  </Button>
+                  <Button 
+                    className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-800"
                   >
-                    Visit Website
-                    <ExternalLink className="ml-2 h-4 w-4" />
-                  </button>
-                </a>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm border border-border/50 p-6">
-              <h2 className="text-xl font-semibold tracking-tight mb-4">Share This Job</h2>
-              <div className="flex gap-3">
-                <button 
-                  className="flex-1 py-2 px-4 bg-gray-50 hover:bg-gray-100 text-gray-800 rounded-md transition-colors flex items-center justify-center"
-                >
-                  <Share2 className="mr-2 h-4 w-4" />
-                  Share
-                </button>
-                <button 
-                  className="flex-1 py-2 px-4 bg-gray-50 hover:bg-gray-100 text-gray-800 rounded-md transition-colors flex items-center justify-center"
-                >
-                  <Bookmark className="mr-2 h-4 w-4" />
-                  Save
-                </button>
+                    <Bookmark className="mr-2 h-4 w-4" />
+                    Save
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
