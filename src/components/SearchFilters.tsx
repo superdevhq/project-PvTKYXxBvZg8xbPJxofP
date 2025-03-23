@@ -53,7 +53,7 @@ const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
             className="pl-9 apple-input"
           />
         </div>
-        
+
         <div className="relative">
           <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
@@ -63,7 +63,7 @@ const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
             className="pl-9 apple-input"
           />
         </div>
-        
+
         <div className="relative">
           <Select
             value={filters.type}
@@ -74,7 +74,7 @@ const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
               <SelectValue placeholder="Job Type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
+              <SelectItem value="all">All Types</SelectItem>
               {jobTypes.map((type) => (
                 <SelectItem key={type} value={type}>
                   {type}
@@ -83,7 +83,7 @@ const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
             </SelectContent>
           </Select>
         </div>
-        
+
         <Button 
           onClick={handleReset}
           variant="outline"
