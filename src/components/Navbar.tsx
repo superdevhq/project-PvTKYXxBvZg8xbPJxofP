@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,17 +9,24 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
+  // Check auth status whenever location changes or component mounts
   useEffect(() => {
     const checkAuth = async () => {
       const { data } = await supabase.auth.getSession();
+      console.log("Auth session check:", !!data.session);
       setIsLoggedIn(!!data.session);
     };
     
     checkAuth();
-    
-    const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
-      setIsLoggedIn(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED');
+  }, [location.pathname]);
+  
+  // Listen for auth state changes
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state change:", event, !!session);
+      setIsLoggedIn(!!session);
     });
     
     return () => {
@@ -30,6 +37,7 @@ const Navbar = () => {
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
+      setIsLoggedIn(false);
       navigate("/");
     } catch (error) {
       console.error("Error signing out:", error);
