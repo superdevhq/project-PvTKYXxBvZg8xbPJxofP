@@ -43,7 +43,7 @@ const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
 
   return (
     <div className="w-full rounded-xl bg-white p-4 shadow-sm border border-border/50">
-      <div className="grid gap-4 md:grid-cols-[1fr_1fr_auto_auto]">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto_auto]">
         <div className="relative">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
@@ -64,7 +64,7 @@ const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
           />
         </div>
 
-        <div className="relative">
+        <div className="relative sm:col-span-2 lg:col-span-1">
           <Select
             value={filters.type}
             onValueChange={(value) => handleChange("type", value)}
@@ -74,7 +74,7 @@ const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
               <SelectValue placeholder="Job Type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="">All Types</SelectItem>
               {jobTypes.map((type) => (
                 <SelectItem key={type} value={type}>
                   {type}
@@ -87,7 +87,7 @@ const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
         <Button 
           onClick={handleReset}
           variant="outline"
-          className="w-full"
+          className="w-full sm:col-span-2 lg:col-span-1"
         >
           Reset
         </Button>
