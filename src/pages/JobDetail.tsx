@@ -221,6 +221,7 @@ const JobDetail = () => {
               <div className="mt-8 space-y-4">
                 <Link to={`/company/${company.id}`}>
                   <Button 
+                    variant="secondary" 
                     className="w-full bg-gray-50 hover:bg-gray-100 text-gray-800 font-medium h-11"
                   >
                     View Company Profile
@@ -229,6 +230,7 @@ const JobDetail = () => {
                 
                 <a href={company.website} target="_blank" rel="noopener noreferrer">
                   <Button 
+                    variant="secondary" 
                     className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium h-11"
                   >
                     Visit Website
@@ -242,12 +244,14 @@ const JobDetail = () => {
               <h2 className="text-xl font-semibold tracking-tight mb-4">Share This Job</h2>
               <div className="flex gap-3">
                 <Button 
+                  variant="secondary" 
                   className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-800"
                 >
                   <Share2 className="mr-2 h-4 w-4" />
                   Share
                 </Button>
                 <Button 
+                  variant="secondary" 
                   className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-800"
                 >
                   <Bookmark className="mr-2 h-4 w-4" />
