@@ -18,25 +18,32 @@ const CompanyProfile = () => {
 
   useEffect(() => {
     const loadCompanyData = async () => {
-      if (!id) return;
-      
+      if (!id) {
+        setError("Company ID is missing");
+        setIsLoading(false);
+        return;
+      }
+
       try {
         setIsLoading(true);
-        
+        console.log("Fetching company with ID:", id);
+
         // Fetch company details
         const companyData = await fetchCompanyById(id);
-        
+        console.log("Company data received:", companyData);
+
         if (!companyData) {
           setError("Company not found");
           return;
         }
-        
+
         setCompany(companyData);
-        
+
         // Fetch jobs for this company
         const companyJobs = await fetchJobsByCompany(id);
+        console.log("Company jobs received:", companyJobs);
         setJobs(companyJobs);
-        
+
         setError(null);
       } catch (err) {
         console.error("Failed to fetch company data:", err);
@@ -85,13 +92,13 @@ const CompanyProfile = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <main className="container py-8">
         <Link to="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Jobs
         </Link>
-        
+
         <div className="bg-white rounded-xl p-6 shadow-sm border border-border/50 mb-8">
           <div className="flex flex-col md:flex-row md:items-center gap-6">
             <div className="h-24 w-24 rounded-lg overflow-hidden flex-shrink-0 bg-gray-50 p-3 border border-border/50">
@@ -101,10 +108,10 @@ const CompanyProfile = () => {
                 className="h-full w-full object-contain"
               />
             </div>
-            
+
             <div>
               <h1 className="text-3xl font-semibold">{company.name}</h1>
-              
+
               <div className="flex flex-wrap gap-4 mt-3 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Globe className="h-4 w-4 text-primary/70" />
@@ -117,17 +124,17 @@ const CompanyProfile = () => {
                     {company.website.replace(/^https?:\/\//, '')}
                   </a>
                 </div>
-                
+
                 <div className="flex items-center gap-1">
                   <MapPin className="h-4 w-4 text-primary/70" />
                   <span>{company.headquarters}</span>
                 </div>
-                
+
                 <div className="flex items-center gap-1">
                   <Users className="h-4 w-4 text-primary/70" />
                   <span>{company.size} employees</span>
                 </div>
-                
+
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4 text-primary/70" />
                   <span>Founded in {company.founded}</span>
@@ -136,35 +143,35 @@ const CompanyProfile = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Main Content */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl p-6 shadow-sm border border-border/50">
               <h2 className="text-xl font-medium mb-4">About {company.name}</h2>
               <p className="text-muted-foreground whitespace-pre-line">{company.description}</p>
-              
+
               <Separator className="my-6" />
-              
+
               <div>
                 <h2 className="text-xl font-medium mb-4">Company Details</h2>
-                
+
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground">Industry</h3>
                     <p>{company.industry}</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground">Company Size</h3>
                     <p>{company.size}</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground">Founded</h3>
                     <p>{company.founded}</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground">Headquarters</h3>
                     <p>{company.headquarters}</p>
@@ -173,7 +180,7 @@ const CompanyProfile = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Sidebar */}
           <div>
             <div className="bg-white rounded-xl p-6 shadow-sm border border-border/50">
@@ -191,13 +198,13 @@ const CompanyProfile = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Company Jobs */}
         <div className="mt-8">
           <h2 className="text-2xl font-medium mb-6">
             {jobs.length} {jobs.length === 1 ? 'Job' : 'Jobs'} at {company.name}
           </h2>
-          
+
           {jobs.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-2">
               {jobs.map(job => (

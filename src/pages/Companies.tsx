@@ -16,6 +16,7 @@ const Companies = () => {
       try {
         setIsLoading(true);
         const data = await fetchCompanies();
+        console.log("Companies loaded:", data);
         setCompanies(data);
         setError(null);
       } catch (err) {
@@ -32,11 +33,11 @@ const Companies = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <main className="container py-8">
         <h1 className="text-3xl font-bold mb-2">Companies</h1>
         <p className="text-muted-foreground mb-8">Browse all companies and explore their open positions</p>
-        
+
         {isLoading ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[...Array(6)].map((_, index) => (
@@ -81,22 +82,22 @@ const Companies = () => {
                       className="h-full w-full object-contain"
                     />
                   </div>
-                  
+
                   <div>
                     <h2 className="text-xl font-medium">{company.name}</h2>
                     <p className="text-muted-foreground text-sm mb-3">{company.industry}</p>
-                    
+
                     <div className="flex flex-col gap-2 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <MapPin className="h-4 w-4 text-primary/70" />
                         <span>{company.headquarters}</span>
                       </div>
-                      
+
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4 text-primary/70" />
                         <span>{company.size}</span>
                       </div>
-                      
+
                       <div className="flex items-center gap-1">
                         <Globe className="h-4 w-4 text-primary/70" />
                         <span>{company.website.replace(/^https?:\/\//, '')}</span>
