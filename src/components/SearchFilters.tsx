@@ -74,7 +74,7 @@ const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
               <SelectValue placeholder="Job Type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
+              <SelectItem value="all">All Types</SelectItem>
               {jobTypes.map((type) => (
                 <SelectItem key={type} value={type}>
                   {type}
