@@ -11,10 +11,14 @@ import {
   Building, 
   ArrowLeft,
   Share2,
-  Bookmark
+  Bookmark,
+  ExternalLink,
+  BriefcaseBusiness,
+  Users
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
 
 const JobDetail = () => {
@@ -38,7 +42,7 @@ const JobDetail = () => {
       }
       setIsLoading(false);
     }, 500);
-    
+
     return () => clearTimeout(timer);
   }, [id]);
 
@@ -80,99 +84,101 @@ const JobDetail = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <main className="container py-8">
         <Link 
           to="/" 
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Jobs
         </Link>
-        
-        <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
+
+        <div className="grid gap-8 lg:grid-cols-[1fr_350px]">
           <div>
-            <div className="apple-card p-6 mb-8">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="h-16 w-16 rounded-md overflow-hidden flex-shrink-0 bg-gray-50 p-2">
+            <div className="bg-white rounded-xl shadow-sm border border-border/50 p-8 mb-8 transition-all duration-200">
+              <div className="flex items-start gap-6 mb-8">
+                <div className="h-20 w-20 rounded-xl overflow-hidden flex-shrink-0 bg-gray-50 p-3 border border-border/50">
                   <img 
                     src={job.logo} 
                     alt={`${job.company} logo`} 
                     className="h-full w-full object-contain"
                   />
                 </div>
-                
+
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2 flex-wrap">
-                    <h1 className="text-2xl font-medium">{job.title}</h1>
-                    <Badge variant="outline" className="whitespace-nowrap">
+                    <h1 className="text-3xl font-semibold tracking-tight">{job.title}</h1>
+                    <Badge variant="outline" className="whitespace-nowrap text-sm font-medium">
                       {job.type}
                     </Badge>
                   </div>
-                  
+
                   <Link 
                     to={`/company/${company.id}`}
-                    className="text-lg text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-xl text-muted-foreground hover:text-foreground transition-colors mt-1 inline-block"
                   >
                     {job.company}
                   </Link>
-                  
-                  <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" />
+
+                  <div className="mt-6 flex flex-wrap gap-5 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-primary" />
                       <span>{job.location}</span>
                     </div>
-                    
-                    <div className="flex items-center gap-1">
-                      <DollarSign className="h-4 w-4" />
+
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-primary" />
                       <span>{job.salary}</span>
                     </div>
-                    
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
+
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-primary" />
                       <span>{timeAgo}</span>
                     </div>
-                    
-                    <div className="flex items-center gap-1">
-                      <Building className="h-4 w-4" />
+
+                    <div className="flex items-center gap-2">
+                      <Building className="h-4 w-4 text-primary" />
                       <span>{company.industry}</span>
                     </div>
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex gap-3">
-                <Button className="flex-1">Apply Now</Button>
-                <Button variant="outline" size="icon">
-                  <Bookmark className="h-4 w-4" />
+                <Button size="lg" className="flex-1 font-medium">
+                  Apply Now
                 </Button>
-                <Button variant="outline" size="icon">
-                  <Share2 className="h-4 w-4" />
+                <Button variant="outline" size="icon" className="h-11 w-11">
+                  <Bookmark className="h-5 w-5" />
+                </Button>
+                <Button variant="outline" size="icon" className="h-11 w-11">
+                  <Share2 className="h-5 w-5" />
                 </Button>
               </div>
             </div>
-            
-            <div className="apple-card p-6 mb-8">
-              <h2 className="text-xl font-medium mb-4">Job Description</h2>
-              <p className="text-muted-foreground mb-6 whitespace-pre-line">
+
+            <div className="bg-white rounded-xl shadow-sm border border-border/50 p-8 mb-8">
+              <h2 className="text-2xl font-semibold tracking-tight mb-6">Job Description</h2>
+              <p className="text-muted-foreground mb-8 whitespace-pre-line leading-relaxed">
                 {job.description}
               </p>
-              
-              <h2 className="text-xl font-medium mb-4">Requirements</h2>
-              <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
+
+              <h2 className="text-2xl font-semibold tracking-tight mb-6">Requirements</h2>
+              <ul className="list-disc pl-5 space-y-3 text-muted-foreground">
                 {job.requirements.map((requirement, index) => (
-                  <li key={index}>{requirement}</li>
+                  <li key={index} className="leading-relaxed">{requirement}</li>
                 ))}
               </ul>
             </div>
           </div>
-          
+
           <div>
-            <div className="apple-card p-6 mb-6">
-              <h2 className="text-xl font-medium mb-4">About {company.name}</h2>
-              
-              <div className="flex justify-center mb-4">
-                <div className="h-20 w-20 rounded-md overflow-hidden bg-gray-50 p-2">
+            <div className="bg-white rounded-xl shadow-sm border border-border/50 p-6 mb-6 sticky top-24">
+              <h2 className="text-xl font-semibold tracking-tight mb-6">About {company.name}</h2>
+
+              <div className="flex justify-center mb-6">
+                <div className="h-24 w-24 rounded-xl overflow-hidden bg-gray-50 p-3 border border-border/50">
                   <img 
                     src={company.logo} 
                     alt={`${company.name} logo`} 
@@ -180,42 +186,57 @@ const JobDetail = () => {
                   />
                 </div>
               </div>
-              
-              <p className="text-muted-foreground mb-4">
-                {company.description}
+
+              <p className="text-muted-foreground mb-6 leading-relaxed">
+                {company.description.length > 150 
+                  ? `${company.description.substring(0, 150)}...` 
+                  : company.description}
               </p>
-              
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
+
+              <Separator className="my-6" />
+
+              <div className="space-y-4 text-sm">
+                <div className="flex items-center gap-3">
+                  <BriefcaseBusiness className="h-4 w-4 text-primary" />
                   <span className="text-muted-foreground">Industry</span>
-                  <span className="font-medium">{company.industry}</span>
+                  <span className="font-medium ml-auto">{company.industry}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex items-center gap-3">
+                  <Users className="h-4 w-4 text-primary" />
                   <span className="text-muted-foreground">Company size</span>
-                  <span className="font-medium">{company.size}</span>
+                  <span className="font-medium ml-auto">{company.size}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex items-center gap-3">
+                  <Clock className="h-4 w-4 text-primary" />
                   <span className="text-muted-foreground">Founded</span>
-                  <span className="font-medium">{company.founded}</span>
+                  <span className="font-medium ml-auto">{company.founded}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex items-center gap-3">
+                  <MapPin className="h-4 w-4 text-primary" />
                   <span className="text-muted-foreground">Headquarters</span>
-                  <span className="font-medium">{company.headquarters}</span>
+                  <span className="font-medium ml-auto">{company.headquarters}</span>
                 </div>
               </div>
-              
-              <div className="mt-6">
+
+              <div className="mt-6 space-y-3">
                 <Link to={`/company/${company.id}`}>
                   <Button variant="outline" className="w-full">
                     View Company Profile
                   </Button>
                 </Link>
+                
+                <a href={company.website} target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" className="w-full">
+                    Visit Website
+                    <ExternalLink className="ml-2 h-4 w-4" />
+                  </Button>
+                </a>
               </div>
             </div>
-            
-            <div className="apple-card p-6">
-              <h2 className="text-xl font-medium mb-4">Share This Job</h2>
-              <div className="flex gap-2">
+
+            <div className="bg-white rounded-xl shadow-sm border border-border/50 p-6">
+              <h2 className="text-xl font-semibold tracking-tight mb-4">Share This Job</h2>
+              <div className="flex gap-3">
                 <Button variant="outline" className="flex-1">
                   <Share2 className="mr-2 h-4 w-4" />
                   Share
