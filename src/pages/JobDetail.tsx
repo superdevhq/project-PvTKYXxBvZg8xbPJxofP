@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Job, Company } from "@/lib/types";
@@ -218,15 +217,21 @@ const JobDetail = () => {
                 </div>
               </div>
 
-              <div className="mt-6 space-y-3">
+              <div className="mt-8 space-y-4">
                 <Link to={`/company/${company.id}`}>
-                  <Button variant="outline" className="w-full">
+                  <Button 
+                    variant="secondary" 
+                    className="w-full bg-gray-50 hover:bg-gray-100 text-gray-800 font-medium h-11"
+                  >
                     View Company Profile
                   </Button>
                 </Link>
                 
                 <a href={company.website} target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline" className="w-full">
+                  <Button 
+                    variant="secondary" 
+                    className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium h-11"
+                  >
                     Visit Website
                     <ExternalLink className="ml-2 h-4 w-4" />
                   </Button>
@@ -237,11 +242,17 @@ const JobDetail = () => {
             <div className="bg-white rounded-xl shadow-sm border border-border/50 p-6">
               <h2 className="text-xl font-semibold tracking-tight mb-4">Share This Job</h2>
               <div className="flex gap-3">
-                <Button variant="outline" className="flex-1">
+                <Button 
+                  variant="secondary" 
+                  className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-800"
+                >
                   <Share2 className="mr-2 h-4 w-4" />
                   Share
                 </Button>
-                <Button variant="outline" className="flex-1">
+                <Button 
+                  variant="secondary" 
+                  className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-800"
+                >
                   <Bookmark className="mr-2 h-4 w-4" />
                   Save
                 </Button>
