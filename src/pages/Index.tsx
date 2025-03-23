@@ -1,46 +1,60 @@
 
 import { useState, useEffect } from "react";
 import { Job, JobFilters } from "@/lib/types";
-import { jobs } from "@/data/mockData";
 import Navbar from "@/components/Navbar";
 import SearchFilters from "@/components/SearchFilters";
 import JobCard from "@/components/JobCard";
+import { fetchJobs, fetchFilteredJobs } from "@/services/supabaseService";
 
 const Index = () => {
-  const [filteredJobs, setFilteredJobs] = useState<Job[]>(jobs);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate loading data
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-    
-    return () => clearTimeout(timer);
+    const loadJobs = async () => {
+      try {
+        setIsLoading(true);
+        const data = await fetchJobs();
+        setJobs(data);
+        setFilteredJobs(data);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch jobs:", err);
+        setError("Failed to load jobs. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadJobs();
   }, []);
 
-  const handleFilterChange = (filters: JobFilters) => {
-    const filtered = jobs.filter(job => {
-      const matchesSearch = !filters.search || 
-        job.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-        job.company.toLowerCase().includes(filters.search.toLowerCase()) ||
-        job.description.toLowerCase().includes(filters.search.toLowerCase());
+  const handleFilterChange = async (filters: JobFilters) => {
+    try {
+      setIsLoading(true);
       
-      const matchesLocation = !filters.location || 
-        job.location.toLowerCase().includes(filters.location.toLowerCase());
+      // If all filters are empty, just show all jobs
+      if (!filters.search && !filters.location && !filters.type) {
+        setFilteredJobs(jobs);
+        return;
+      }
       
-      const matchesType = !filters.type || job.type === filters.type;
-      
-      return matchesSearch && matchesLocation && matchesType;
-    });
-    
-    setFilteredJobs(filtered);
+      const filtered = await fetchFilteredJobs(filters);
+      setFilteredJobs(filtered);
+    } catch (err) {
+      console.error("Failed to filter jobs:", err);
+      setError("Failed to filter jobs. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <main className="container py-8">
         <section className="mb-12 text-center">
           <h1 className="text-4xl font-semibold tracking-tight mb-4">
@@ -50,18 +64,25 @@ const Index = () => {
             Discover opportunities at the world's leading tech companies
           </p>
         </section>
-        
+
         <section className="mb-8">
           <SearchFilters onFilterChange={handleFilterChange} />
         </section>
-        
+
         <section>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-medium">
               {filteredJobs.length} {filteredJobs.length === 1 ? 'Job' : 'Jobs'} Available
             </h2>
           </div>
-          
+
+          {error && (
+            <div className="text-center py-12 text-red-500">
+              <h3 className="text-xl font-medium mb-2">Error</h3>
+              <p>{error}</p>
+            </div>
+          )}
+
           {isLoading ? (
             <div className="grid gap-4 md:grid-cols-2">
               {[...Array(6)].map((_, index) => (

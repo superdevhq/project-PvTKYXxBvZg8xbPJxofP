@@ -1,41 +1,52 @@
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Company, Job } from "@/lib/types";
-import { getCompanyById, getJobsByCompany } from "@/data/mockData";
-import { 
-  Building, 
-  Globe, 
-  Users, 
-  Calendar, 
-  ArrowLeft,
-  ExternalLink
-} from "lucide-react";
+import { ArrowLeft, Globe, MapPin, Users, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import JobCard from "@/components/JobCard";
+import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
+import JobCard from "@/components/JobCard";
+import { Company, Job } from "@/lib/types";
+import { fetchCompanyById, fetchJobsByCompany } from "@/services/supabaseService";
 
 const CompanyProfile = () => {
   const { id } = useParams<{ id: string }>();
   const [company, setCompany] = useState<Company | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate API call
-    const timer = setTimeout(() => {
-      if (id) {
-        const foundCompany = getCompanyById(id);
-        if (foundCompany) {
-          setCompany(foundCompany);
-          const companyJobs = getJobsByCompany(id);
-          setJobs(companyJobs);
+    const loadCompanyData = async () => {
+      if (!id) return;
+      
+      try {
+        setIsLoading(true);
+        
+        // Fetch company details
+        const companyData = await fetchCompanyById(id);
+        
+        if (!companyData) {
+          setError("Company not found");
+          return;
         }
+        
+        setCompany(companyData);
+        
+        // Fetch jobs for this company
+        const companyJobs = await fetchJobsByCompany(id);
+        setJobs(companyJobs);
+        
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch company data:", err);
+        setError("Failed to load company details. Please try again later.");
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    }, 500);
-    
-    return () => clearTimeout(timer);
+    };
+
+    loadCompanyData();
   }, [id]);
 
   if (isLoading) {
@@ -43,22 +54,23 @@ const CompanyProfile = () => {
       <div className="min-h-screen bg-background">
         <Navbar />
         <main className="container py-8">
-          <div className="h-64 rounded-xl bg-gray-100 animate-pulse mb-4" />
-          <div className="h-96 rounded-xl bg-gray-100 animate-pulse" />
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/4 mb-8"></div>
+            <div className="h-64 bg-gray-200 rounded mb-6"></div>
+            <div className="h-32 bg-gray-200 rounded"></div>
+          </div>
         </main>
       </div>
     );
   }
 
-  if (!company) {
+  if (error || !company) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="container py-16 text-center">
-          <h1 className="text-3xl font-medium mb-4">Company Not Found</h1>
-          <p className="text-muted-foreground mb-8">
-            The company you're looking for doesn't exist or has been removed.
-          </p>
+        <main className="container py-8 text-center">
+          <h2 className="text-2xl font-medium mb-4">{error || "Company not found"}</h2>
           <Link to="/">
             <Button>
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -75,17 +87,14 @@ const CompanyProfile = () => {
       <Navbar />
       
       <main className="container py-8">
-        <Link 
-          to="/" 
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6"
-        >
+        <Link to="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Jobs
         </Link>
         
-        <div className="apple-card p-8 mb-8">
-          <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
-            <div className="h-32 w-32 rounded-xl overflow-hidden flex-shrink-0 bg-gray-50 p-4">
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-border/50 mb-8">
+          <div className="flex flex-col md:flex-row md:items-center gap-6">
+            <div className="h-24 w-24 rounded-lg overflow-hidden flex-shrink-0 bg-gray-50 p-3 border border-border/50">
               <img 
                 src={company.logo} 
                 alt={`${company.name} logo`} 
@@ -93,65 +102,100 @@ const CompanyProfile = () => {
               />
             </div>
             
-            <div className="flex-1 min-w-0 text-center md:text-left">
-              <h1 className="text-3xl font-medium mb-2">{company.name}</h1>
+            <div>
+              <h1 className="text-3xl font-semibold">{company.name}</h1>
               
-              <p className="text-muted-foreground mb-6 max-w-3xl">
-                {company.description}
-              </p>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="flex flex-col items-center md:items-start gap-1">
-                  <div className="flex items-center text-muted-foreground">
-                    <Building className="h-4 w-4 mr-2" />
-                    <span>Industry</span>
-                  </div>
-                  <span className="font-medium">{company.industry}</span>
+              <div className="flex flex-wrap gap-4 mt-3 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Globe className="h-4 w-4 text-primary/70" />
+                  <a 
+                    href={company.website} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-foreground"
+                  >
+                    {company.website.replace(/^https?:\/\//, '')}
+                  </a>
                 </div>
                 
-                <div className="flex flex-col items-center md:items-start gap-1">
-                  <div className="flex items-center text-muted-foreground">
-                    <Users className="h-4 w-4 mr-2" />
-                    <span>Company Size</span>
-                  </div>
-                  <span className="font-medium">{company.size}</span>
+                <div className="flex items-center gap-1">
+                  <MapPin className="h-4 w-4 text-primary/70" />
+                  <span>{company.headquarters}</span>
                 </div>
                 
-                <div className="flex flex-col items-center md:items-start gap-1">
-                  <div className="flex items-center text-muted-foreground">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    <span>Founded</span>
-                  </div>
-                  <span className="font-medium">{company.founded}</span>
+                <div className="flex items-center gap-1">
+                  <Users className="h-4 w-4 text-primary/70" />
+                  <span>{company.size} employees</span>
                 </div>
                 
-                <div className="flex flex-col items-center md:items-start gap-1">
-                  <div className="flex items-center text-muted-foreground">
-                    <Globe className="h-4 w-4 mr-2" />
-                    <span>Headquarters</span>
-                  </div>
-                  <span className="font-medium">{company.headquarters}</span>
+                <div className="flex items-center gap-1">
+                  <Calendar className="h-4 w-4 text-primary/70" />
+                  <span>Founded in {company.founded}</span>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="grid gap-8 lg:grid-cols-3">
+          {/* Main Content */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-border/50">
+              <h2 className="text-xl font-medium mb-4">About {company.name}</h2>
+              <p className="text-muted-foreground whitespace-pre-line">{company.description}</p>
               
+              <Separator className="my-6" />
+              
+              <div>
+                <h2 className="text-xl font-medium mb-4">Company Details</h2>
+                
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">Industry</h3>
+                    <p>{company.industry}</p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">Company Size</h3>
+                    <p>{company.size}</p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">Founded</h3>
+                    <p>{company.founded}</p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">Headquarters</h3>
+                    <p>{company.headquarters}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Sidebar */}
+          <div>
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-border/50">
+              <h2 className="text-xl font-medium mb-4">Company Website</h2>
               <a 
                 href={company.website} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex"
               >
-                <Button>
+                <Button variant="outline" className="w-full">
+                  <Globe className="mr-2 h-4 w-4" />
                   Visit Website
-                  <ExternalLink className="ml-2 h-4 w-4" />
                 </Button>
               </a>
             </div>
           </div>
         </div>
         
-        <section>
+        {/* Company Jobs */}
+        <div className="mt-8">
           <h2 className="text-2xl font-medium mb-6">
-            {jobs.length} Open Positions at {company.name}
+            {jobs.length} {jobs.length === 1 ? 'Job' : 'Jobs'} at {company.name}
           </h2>
           
           {jobs.length > 0 ? (
@@ -161,14 +205,14 @@ const CompanyProfile = () => {
               ))}
             </div>
           ) : (
-            <div className="apple-card p-8 text-center">
+            <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-border/50">
               <h3 className="text-xl font-medium mb-2">No open positions</h3>
               <p className="text-muted-foreground">
-                {company.name} doesn't have any open positions at the moment.
+                There are currently no job openings at {company.name}
               </p>
             </div>
           )}
-        </section>
+        </div>
       </main>
     </div>
   );

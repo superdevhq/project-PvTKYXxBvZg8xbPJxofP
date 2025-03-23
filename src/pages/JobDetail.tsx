@@ -1,48 +1,45 @@
-import { useEffect, useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Job, Company } from "@/lib/types";
-import { getJobById, getCompanyById } from "@/data/mockData";
 import { formatDistanceToNow } from "date-fns";
-import { 
-  MapPin, 
-  Clock, 
-  DollarSign, 
-  Building, 
-  ArrowLeft,
-  Share2,
-  Bookmark,
-  ExternalLink,
-  BriefcaseBusiness,
-  Users
-} from "lucide-react";
+import { MapPin, Building, Calendar, DollarSign, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
+import { Job } from "@/lib/types";
+import { fetchJobById } from "@/services/supabaseService";
 
 const JobDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [job, setJob] = useState<Job | null>(null);
-  const [company, setCompany] = useState<Company | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate API call
-    const timer = setTimeout(() => {
-      if (id) {
-        const foundJob = getJobById(id);
-        if (foundJob) {
-          setJob(foundJob);
-          const foundCompany = getCompanyById(foundJob.companyId);
-          if (foundCompany) {
-            setCompany(foundCompany);
-          }
+    const loadJob = async () => {
+      if (!id) return;
+      
+      try {
+        setIsLoading(true);
+        const jobData = await fetchJobById(id);
+        
+        if (!jobData) {
+          setError("Job not found");
+          return;
         }
+        
+        setJob(jobData);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch job:", err);
+        setError("Failed to load job details. Please try again later.");
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    }, 500);
+    };
 
-    return () => clearTimeout(timer);
+    loadJob();
   }, [id]);
 
   if (isLoading) {
@@ -50,22 +47,23 @@ const JobDetail = () => {
       <div className="min-h-screen bg-background">
         <Navbar />
         <main className="container py-8">
-          <div className="h-96 rounded-xl bg-gray-100 animate-pulse mb-4" />
-          <div className="h-64 rounded-xl bg-gray-100 animate-pulse" />
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/4 mb-8"></div>
+            <div className="h-64 bg-gray-200 rounded mb-6"></div>
+            <div className="h-32 bg-gray-200 rounded"></div>
+          </div>
         </main>
       </div>
     );
   }
 
-  if (!job || !company) {
+  if (error || !job) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="container py-16 text-center">
-          <h1 className="text-3xl font-medium mb-4">Job Not Found</h1>
-          <p className="text-muted-foreground mb-8">
-            The job you're looking for doesn't exist or has been removed.
-          </p>
+        <main className="container py-8 text-center">
+          <h2 className="text-2xl font-medium mb-4">{error || "Job not found"}</h2>
           <Link to="/">
             <Button>
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -83,182 +81,102 @@ const JobDetail = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-
+      
       <main className="container py-8">
-        <Link 
-          to="/" 
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
-        >
+        <Link to="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Jobs
         </Link>
-
-        <div className="grid gap-8 lg:grid-cols-[1fr_350px]">
-          <div>
-            <div className="bg-white rounded-xl shadow-sm border border-border/50 p-8 mb-8 transition-all duration-200">
-              <div className="flex items-start gap-6 mb-8">
-                <div className="h-20 w-20 rounded-xl overflow-hidden flex-shrink-0 bg-gray-50 p-3 border border-border/50">
+        
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-border/50">
+              <div className="flex items-start gap-4">
+                <div className="h-16 w-16 rounded-lg overflow-hidden flex-shrink-0 bg-gray-50 p-2 border border-border/50">
                   <img 
                     src={job.logo} 
                     alt={`${job.company} logo`} 
                     className="h-full w-full object-contain"
                   />
                 </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2 flex-wrap">
-                    <h1 className="text-3xl font-semibold tracking-tight">{job.title}</h1>
-                    <Badge variant="outline" className="whitespace-nowrap text-sm font-medium">
-                      {job.type}
-                    </Badge>
+                
+                <div>
+                  <h1 className="text-2xl font-semibold">{job.title}</h1>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Link to={`/company/${job.companyId}`} className="text-muted-foreground hover:text-foreground">
+                      {job.company}
+                    </Link>
+                    <Badge variant="outline">{job.type}</Badge>
                   </div>
-
-                  <Link 
-                    to={`/company/${company.id}`}
-                    className="text-xl text-muted-foreground hover:text-foreground transition-colors mt-1 inline-block"
-                  >
-                    {job.company}
-                  </Link>
-
-                  <div className="mt-6 flex flex-wrap gap-5 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-primary" />
+                  
+                  <div className="flex flex-wrap gap-4 mt-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <MapPin className="h-4 w-4 text-primary/70" />
                       <span>{job.location}</span>
                     </div>
-
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4 text-primary" />
+                    
+                    <div className="flex items-center gap-1">
+                      <DollarSign className="h-4 w-4 text-primary/70" />
                       <span>{job.salary}</span>
                     </div>
-
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-primary" />
-                      <span>{timeAgo}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Building className="h-4 w-4 text-primary" />
-                      <span>{company.industry}</span>
+                    
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-4 w-4 text-primary/70" />
+                      <span>Posted {timeAgo}</span>
                     </div>
                   </div>
                 </div>
               </div>
-
-              <div className="flex gap-3">
-                <Button size="lg" className="flex-1 font-medium">
-                  Apply Now
-                </Button>
-                <Button variant="outline" size="icon" className="h-11 w-11">
-                  <Bookmark className="h-5 w-5" />
-                </Button>
-                <Button variant="outline" size="icon" className="h-11 w-11">
-                  <Share2 className="h-5 w-5" />
-                </Button>
-              </div>
             </div>
-
-            <div className="bg-white rounded-xl shadow-sm border border-border/50 p-8 mb-8">
-              <h2 className="text-2xl font-semibold tracking-tight mb-6">Job Description</h2>
-              <p className="text-muted-foreground mb-8 whitespace-pre-line leading-relaxed">
-                {job.description}
-              </p>
-
-              <h2 className="text-2xl font-semibold tracking-tight mb-6">Requirements</h2>
-              <ul className="list-disc pl-5 space-y-3 text-muted-foreground">
-                {job.requirements.map((requirement, index) => (
-                  <li key={index} className="leading-relaxed">{requirement}</li>
+            
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-border/50">
+              <h2 className="text-xl font-medium mb-4">Job Description</h2>
+              <p className="text-muted-foreground whitespace-pre-line">{job.description}</p>
+              
+              <Separator className="my-6" />
+              
+              <h2 className="text-xl font-medium mb-4">Requirements</h2>
+              <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
+                {job.requirements.map((req, index) => (
+                  <li key={index}>{req}</li>
                 ))}
               </ul>
             </div>
           </div>
-
-          <div className="relative">
-            <div className="sticky top-24 space-y-6">
-              <div className="bg-white rounded-xl shadow-sm border border-border/50 p-6">
-                <h2 className="text-xl font-semibold tracking-tight mb-6">About {company.name}</h2>
-
-                <div className="flex justify-center mb-6">
-                  <div className="h-24 w-24 rounded-xl overflow-hidden bg-gray-50 p-3 border border-border/50">
-                    <img 
-                      src={company.logo} 
-                      alt={`${company.name} logo`} 
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
+          
+          {/* Sidebar */}
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-border/50">
+              <h2 className="text-xl font-medium mb-4">Company Info</h2>
+              
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-10 w-10 rounded overflow-hidden flex-shrink-0 bg-gray-50 p-1 border border-border/50">
+                  <img 
+                    src={job.logo} 
+                    alt={`${job.company} logo`} 
+                    className="h-full w-full object-contain"
+                  />
                 </div>
-
-                <p className="text-muted-foreground mb-6 leading-relaxed">
-                  {company.description.length > 150 
-                    ? `${company.description.substring(0, 150)}...` 
-                    : company.description}
-                </p>
-
-                <Separator className="my-6" />
-
-                <div className="space-y-4 text-sm">
-                  <div className="flex items-center gap-3">
-                    <BriefcaseBusiness className="h-4 w-4 text-primary" />
-                    <span className="text-muted-foreground">Industry</span>
-                    <span className="font-medium ml-auto">{company.industry}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Users className="h-4 w-4 text-primary" />
-                    <span className="text-muted-foreground">Company size</span>
-                    <span className="font-medium ml-auto">{company.size}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Clock className="h-4 w-4 text-primary" />
-                    <span className="text-muted-foreground">Founded</span>
-                    <span className="font-medium ml-auto">{company.founded}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <MapPin className="h-4 w-4 text-primary" />
-                    <span className="text-muted-foreground">Headquarters</span>
-                    <span className="font-medium ml-auto">{company.headquarters}</span>
-                  </div>
-                </div>
-
-                <div className="pt-10">
-                  <div className="mb-6">
-                    <Link to={`/company/${company.id}`} className="block w-full">
-                      <Button 
-                        className="w-full bg-gray-50 hover:bg-gray-100 text-gray-800 font-medium h-12"
-                      >
-                        View Company Profile
-                      </Button>
-                    </Link>
-                  </div>
-                  
-                  <div>
-                    <a href={company.website} target="_blank" rel="noopener noreferrer" className="block w-full">
-                      <Button 
-                        className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium h-12"
-                      >
-                        Visit Website
-                        <ExternalLink className="ml-2 h-4 w-4" />
-                      </Button>
-                    </a>
-                  </div>
+                <div>
+                  <h3 className="font-medium">{job.company}</h3>
                 </div>
               </div>
-
-              <div className="bg-white rounded-xl shadow-sm border border-border/50 p-6">
-                <h2 className="text-xl font-semibold tracking-tight mb-4">Share This Job</h2>
-                <div className="flex gap-3">
-                  <Button 
-                    className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-800"
-                  >
-                    <Share2 className="mr-2 h-4 w-4" />
-                    Share
-                  </Button>
-                  <Button 
-                    className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-800"
-                  >
-                    <Bookmark className="mr-2 h-4 w-4" />
-                    Save
-                  </Button>
-                </div>
-              </div>
+              
+              <Link to={`/company/${job.companyId}`}>
+                <Button variant="outline" className="w-full">
+                  <Building className="mr-2 h-4 w-4" />
+                  View Company Profile
+                </Button>
+              </Link>
+            </div>
+            
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-border/50">
+              <h2 className="text-xl font-medium mb-4">Apply for this job</h2>
+              <Button className="w-full">Apply Now</Button>
+              <p className="text-sm text-muted-foreground mt-4 text-center">
+                Application will be sent to the employer
+              </p>
             </div>
           </div>
         </div>
