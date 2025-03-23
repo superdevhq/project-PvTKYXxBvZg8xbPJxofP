@@ -9,7 +9,98 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      companies: {
+        Row: {
+          created_at: string
+          description: string
+          founded: number
+          headquarters: string
+          id: string
+          industry: string
+          logo: string
+          name: string
+          size: string
+          website: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          founded: number
+          headquarters: string
+          id: string
+          industry: string
+          logo: string
+          name: string
+          size: string
+          website: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          founded?: number
+          headquarters?: string
+          id?: string
+          industry?: string
+          logo?: string
+          name?: string
+          size?: string
+          website?: string
+        }
+        Relationships: []
+      }
+      jobs: {
+        Row: {
+          company: string
+          company_id: string
+          created_at: string
+          description: string
+          id: string
+          location: string
+          logo: string
+          posted: string
+          requirements: Json
+          salary: string
+          title: string
+          type: string
+        }
+        Insert: {
+          company: string
+          company_id: string
+          created_at?: string
+          description: string
+          id: string
+          location: string
+          logo: string
+          posted: string
+          requirements: Json
+          salary: string
+          title: string
+          type: string
+        }
+        Update: {
+          company?: string
+          company_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          location?: string
+          logo?: string
+          posted?: string
+          requirements?: Json
+          salary?: string
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
