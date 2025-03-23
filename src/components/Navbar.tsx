@@ -1,11 +1,31 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      setIsLoggedIn(!!data.session);
+    };
+    
+    checkAuth();
+    
+    const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
+      setIsLoggedIn(event === 'SIGNED_IN');
+    });
+    
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -54,15 +74,22 @@ const Navbar = () => {
           <Link to="/companies" className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground">
             Companies
           </Link>
-          <Link to="/about" className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground">
-            About
-          </Link>
         </nav>
 
         {/* Desktop buttons */}
         <div className="ml-4 hidden md:flex items-center gap-2">
-          <Button variant="outline" size="sm">Sign In</Button>
-          <Button size="sm">Post a Job</Button>
+          {isLoggedIn ? (
+            <Button size="sm" onClick={() => navigate("/dashboard")}>Dashboard</Button>
+          ) : (
+            <>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/login">Sign In</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link to="/register">Post a Job</Link>
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -85,18 +112,43 @@ const Navbar = () => {
               >
                 Companies
               </Link>
-              <Link 
-                to="/about" 
-                className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground py-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                About
-              </Link>
             </nav>
-            
+
             <div className="flex flex-col gap-2 mt-2">
-              <Button variant="outline" size="sm" className="w-full">Sign In</Button>
-              <Button size="sm" className="w-full">Post a Job</Button>
+              {isLoggedIn ? (
+                <Button 
+                  size="sm" 
+                  className="w-full"
+                  onClick={() => {
+                    navigate("/dashboard");
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Dashboard
+                </Button>
+              ) : (
+                <>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    asChild
+                  >
+                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                      Sign In
+                    </Link>
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    className="w-full"
+                    asChild
+                  >
+                    <Link to="/register" onClick={() => setIsMenuOpen(false)}>
+                      Post a Job
+                    </Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -98,7 +98,7 @@ export const fetchCompanies = async (): Promise<Company[]> => {
 // Fetch a single company by ID
 export const fetchCompanyById = async (id: string): Promise<Company | null> => {
   console.log("Fetching company with ID:", id);
-  
+
   const { data, error } = await supabase
     .from('companies')
     .select('*')
@@ -121,7 +121,7 @@ export const fetchCompanyById = async (id: string): Promise<Company | null> => {
 // Fetch jobs by company ID
 export const fetchJobsByCompany = async (companyId: string): Promise<Job[]> => {
   console.log("Fetching jobs for company ID:", companyId);
-  
+
   const { data, error } = await supabase
     .from('jobs')
     .select('*')
@@ -139,4 +139,77 @@ export const fetchJobsByCompany = async (companyId: string): Promise<Job[]> => {
     type: job.type as any,
     companyId: job.company_id
   }));
+};
+
+// Create a new job
+export const createJob = async (jobData: Omit<Job, 'id'> & { id?: string }): Promise<Job> => {
+  const { data, error } = await supabase
+    .from('jobs')
+    .insert(jobData)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating job:', error);
+    throw error;
+  }
+
+  return {
+    ...data,
+    requirements: data.requirements as string[],
+    type: data.type as any,
+    companyId: data.company_id
+  };
+};
+
+// Update a job
+export const updateJob = async (id: string, jobData: Partial<Job>): Promise<Job> => {
+  const { data, error } = await supabase
+    .from('jobs')
+    .update(jobData)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating job:', error);
+    throw error;
+  }
+
+  return {
+    ...data,
+    requirements: data.requirements as string[],
+    type: data.type as any,
+    companyId: data.company_id
+  };
+};
+
+// Delete a job
+export const deleteJob = async (id: string): Promise<void> => {
+  const { error } = await supabase
+    .from('jobs')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting job:', error);
+    throw error;
+  }
+};
+
+// Update company profile
+export const updateCompany = async (id: string, companyData: Partial<Company>): Promise<Company> => {
+  const { data, error } = await supabase
+    .from('companies')
+    .update(companyData)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating company:', error);
+    throw error;
+  }
+
+  return data;
 };
