@@ -1,6 +1,6 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { JobApplication, ApplicationStatus } from "@/lib/types";
+import { sendNewApplicationEmail } from "./emailService";
 
 // Submit a job application
 export const submitJobApplication = async (application: Omit<JobApplication, 'id' | 'status' | 'createdAt' | 'updatedAt'>): Promise<JobApplication> => {
@@ -24,7 +24,8 @@ export const submitJobApplication = async (application: Omit<JobApplication, 'id
     throw error;
   }
 
-  return {
+  // Convert the database response to our application model
+  const newApplication: JobApplication = {
     id: data.id,
     jobId: data.job_id,
     userId: data.user_id,
@@ -37,6 +38,16 @@ export const submitJobApplication = async (application: Omit<JobApplication, 'id
     createdAt: data.created_at,
     updatedAt: data.updated_at
   };
+
+  // Send email notification
+  try {
+    await sendNewApplicationEmail(newApplication.id);
+  } catch (err) {
+    console.error('Failed to send application notification email:', err);
+    // We don't throw here to avoid blocking the application submission
+  }
+
+  return newApplication;
 };
 
 // Get user's job applications
