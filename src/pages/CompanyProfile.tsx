@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Globe, MapPin, Users, Calendar } from "lucide-react";
@@ -132,7 +133,7 @@ const CompanyProfile = () => {
 
                 <div className="flex items-center gap-1">
                   <Users className="h-4 w-4 text-primary/70" />
-                  <span>{company.size} employees</span>
+                  <span>{company.size}</span>
                 </div>
 
                 <div className="flex items-center gap-1">

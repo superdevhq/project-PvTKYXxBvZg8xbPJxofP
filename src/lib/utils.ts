@@ -10,7 +10,7 @@ export function getCompanyLogo(logo: string | null | undefined): string {
   if (logo && logo.trim() !== '' && !logo.includes('via.placeholder.com')) {
     return logo;
   }
-  
+
   // Return a default company logo
   return "https://placehold.co/400x400/5271ff/ffffff?text=Company";
 }
