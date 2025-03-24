@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getCompanyLogo(logo: string | null | undefined): string {
-  if (logo && logo.trim() !== '') {
+  if (logo && logo.trim() !== '' && !logo.includes('via.placeholder.com')) {
     return logo;
   }
   
