@@ -40,8 +40,9 @@ const Dashboard = () => {
         const applicationsData = await getCompanyApplications();
         setApplications(applicationsData);
         
-        // Load company profile (for demo, we're using a fixed company ID)
-        // In a real app, this would come from the user's profile
+        // Load company profile
+        // In a real app, this would come from the user's profile or a company_users table
+        // For now, we're using a fixed company ID for demonstration
         const companyId = "apple"; // This is just for demo purposes
         const companyData = await fetchCompanyById(companyId);
         setCompany(companyData);
