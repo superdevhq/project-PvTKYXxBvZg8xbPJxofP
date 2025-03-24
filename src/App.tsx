@@ -1,17 +1,16 @@
 
-import { useState, useEffect } from 'react'
-import { Routes, Route } from 'react-router-dom'
-import Index from './pages/Index'
-import JobDetail from './pages/JobDetail'
-import Companies from './pages/Companies'
-import CompanyProfile from './pages/CompanyProfile'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import Dashboard from './pages/Dashboard'
-import PostJob from './pages/PostJob'
-import MyApplications from './pages/MyApplications'
-import NotFound from './pages/NotFound'
-import './App.css'
+import { Routes, Route } from 'react-router-dom';
+import Index from './pages/Index';
+import JobDetail from './pages/JobDetail';
+import Companies from './pages/Companies';
+import CompanyProfile from './pages/CompanyProfile';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import PostJob from './pages/PostJob';
+import MyApplications from './pages/MyApplications';
+import NotFound from './pages/NotFound';
+import './App.css';
 
 function App() {
   return (
@@ -27,7 +26,7 @@ function App() {
       <Route path="/my-applications" element={<MyApplications />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
-  )
+  );
 }
 
-export default App
+export default App;
