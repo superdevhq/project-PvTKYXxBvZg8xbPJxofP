@@ -1,10 +1,15 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
-import { corsHeaders } from '../_shared/cors.ts'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || ''
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') || ''
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || ''
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+}
 
 interface EmailPayload {
   to: string
@@ -95,7 +100,7 @@ Deno.serve(async (req) => {
       .eq('id', application.jobs.company_id)
       .single()
 
-    const companyEmail = companyOwner?.email || 'no-reply@jobboard.com'
+    const companyEmail = companyOwner?.email || 'no-reply@updates.trytadam.com'
 
     // Prepare email content based on application type
     let candidateEmail: EmailPayload
@@ -122,7 +127,7 @@ Deno.serve(async (req) => {
             <p>The ${application.jobs.company} Team</p>
           </div>
         `,
-        from: `${company.name} <${companyEmail}>`
+        from: `${company.name} <no-reply@updates.trytadam.com>`
       }
 
       // Email to company
@@ -142,7 +147,7 @@ Deno.serve(async (req) => {
             <p>You can review this application in your dashboard.</p>
           </div>
         `,
-        from: 'JobBoard <notifications@jobboard.com>'
+        from: 'JobBoard <no-reply@updates.trytadam.com>'
       }
     } else if (applicationType === 'status-change') {
       // Email to candidate about status change
@@ -185,7 +190,7 @@ Deno.serve(async (req) => {
             <p>The ${application.jobs.company} Team</p>
           </div>
         `,
-        from: `${company.name} <${companyEmail}>`
+        from: `${company.name} <no-reply@updates.trytadam.com>`
       }
     } else {
       return new Response(
@@ -206,7 +211,7 @@ Deno.serve(async (req) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: email.from || 'JobBoard <notifications@jobboard.com>',
+          from: email.from || 'JobBoard <no-reply@updates.trytadam.com>',
           to: email.to,
           subject: email.subject,
           html: email.html
