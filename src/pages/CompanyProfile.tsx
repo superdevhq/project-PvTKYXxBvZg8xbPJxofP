@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Globe, MapPin, Users, Calendar } from "lucide-react";
@@ -8,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import JobCard from "@/components/JobCard";
 import { Company, Job } from "@/lib/types";
 import { fetchCompanyById, fetchJobsByCompany } from "@/services/supabaseService";
+import { getCompanyLogo } from "@/lib/utils";
 
 const CompanyProfile = () => {
   const { id } = useParams<{ id: string }>();
@@ -103,7 +103,7 @@ const CompanyProfile = () => {
           <div className="flex flex-col md:flex-row md:items-center gap-6">
             <div className="h-24 w-24 rounded-lg overflow-hidden flex-shrink-0 bg-gray-50 p-3 border border-border/50">
               <img 
-                src={company.logo} 
+                src={getCompanyLogo(company.logo)} 
                 alt={`${company.name} logo`} 
                 className="h-full w-full object-contain"
               />
@@ -144,8 +144,8 @@ const CompanyProfile = () => {
           </div>
         </div>
 
+        {/* Main Content */}
         <div className="grid gap-8 lg:grid-cols-3">
-          {/* Main Content */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl p-6 shadow-sm border border-border/50">
               <h2 className="text-xl font-medium mb-4">About {company.name}</h2>

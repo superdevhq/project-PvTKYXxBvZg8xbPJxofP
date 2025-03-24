@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
@@ -9,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
 import { Job } from "@/lib/types";
 import { fetchJobById } from "@/services/supabaseService";
+import { getCompanyLogo } from "@/lib/utils";
 
 const JobDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -95,7 +95,7 @@ const JobDetail = () => {
               <div className="flex items-start gap-4">
                 <div className="h-16 w-16 rounded-lg overflow-hidden flex-shrink-0 bg-gray-50 p-2 border border-border/50">
                   <img 
-                    src={job.logo} 
+                    src={getCompanyLogo(job.logo)} 
                     alt={`${job.company} logo`} 
                     className="h-full w-full object-contain"
                   />
@@ -149,11 +149,11 @@ const JobDetail = () => {
           <div className="space-y-6">
             <div className="bg-white rounded-xl p-6 shadow-sm border border-border/50">
               <h2 className="text-xl font-medium mb-4">Company Info</h2>
-              
+
               <div className="flex items-center gap-3 mb-4">
                 <div className="h-10 w-10 rounded overflow-hidden flex-shrink-0 bg-gray-50 p-1 border border-border/50">
                   <img 
-                    src={job.logo} 
+                    src={getCompanyLogo(job.logo)} 
                     alt={`${job.company} logo`} 
                     className="h-full w-full object-contain"
                   />
@@ -162,7 +162,7 @@ const JobDetail = () => {
                   <h3 className="font-medium">{job.company}</h3>
                 </div>
               </div>
-              
+
               <Link to={`/company/${job.companyId}`}>
                 <Button variant="outline" className="w-full">
                   <Building className="mr-2 h-4 w-4" />
@@ -170,7 +170,7 @@ const JobDetail = () => {
                 </Button>
               </Link>
             </div>
-            
+
             <div className="bg-white rounded-xl p-6 shadow-sm border border-border/50">
               <h2 className="text-xl font-medium mb-4">Apply for this job</h2>
               <Button className="w-full">Apply Now</Button>
