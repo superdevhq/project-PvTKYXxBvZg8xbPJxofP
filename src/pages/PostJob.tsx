@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { JobType } from "@/lib/types";
 import { v4 as uuidv4 } from 'uuid';
+import { Wand2 } from "lucide-react";
 
 const PostJob = () => {
   const [title, setTitle] = useState("");
@@ -20,12 +21,13 @@ const PostJob = () => {
   const [description, setDescription] = useState("");
   const [requirements, setRequirements] = useState("");
   const [loading, setLoading] = useState(false);
+  const [improvingDescription, setImprovingDescription] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!title || !location || !type || !salary || !description || !requirements) {
       toast({
         title: "Error",
@@ -37,30 +39,30 @@ const PostJob = () => {
 
     try {
       setLoading(true);
-      
+
       // Get current user
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (!session) {
         navigate("/login");
         return;
       }
-      
+
       // Get company data
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .select('*')
         .eq('id', session.user.id)
         .single();
-      
+
       if (companyError) throw companyError;
-      
+
       // Parse requirements into array
       const requirementsArray = requirements
         .split('\n')
         .map(req => req.trim())
         .filter(req => req.length > 0);
-      
+
       // Create new job
       const { error: jobError } = await supabase
         .from('jobs')
@@ -77,14 +79,14 @@ const PostJob = () => {
           posted: new Date().toISOString(),
           logo: companyData.logo
         });
-      
+
       if (jobError) throw jobError;
-      
+
       toast({
         title: "Success",
         description: "Job posted successfully",
       });
-      
+
       navigate("/dashboard");
     } catch (error: any) {
       console.error("Error posting job:", error);
@@ -95,6 +97,43 @@ const PostJob = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const improveDescription = async () => {
+    if (!description.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a job description first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setImprovingDescription(true);
+      
+      const { data, error } = await supabase.functions.invoke('improve-job-description', {
+        body: { description }
+      });
+
+      if (error) throw error;
+      
+      setDescription(data.improvedDescription);
+      
+      toast({
+        title: "Success",
+        description: "Job description improved successfully",
+      });
+    } catch (error: any) {
+      console.error("Error improving description:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to improve job description",
+        variant: "destructive",
+      });
+    } finally {
+      setImprovingDescription(false);
     }
   };
 
@@ -110,7 +149,7 @@ const PostJob = () => {
         >
           Back to Dashboard
         </Button>
-        
+
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl">Post a New Job</CardTitle>
@@ -130,7 +169,7 @@ const PostJob = () => {
                   required
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="location">Location</Label>
                 <Input
@@ -141,7 +180,7 @@ const PostJob = () => {
                   required
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="type">Job Type</Label>
                 <Select value={type} onValueChange={(value) => setType(value as JobType)} required>
@@ -157,7 +196,7 @@ const PostJob = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="salary">Salary Range</Label>
                 <Input
@@ -168,9 +207,22 @@ const PostJob = () => {
                   required
                 />
               </div>
-              
+
               <div className="space-y-2">
-                <Label htmlFor="description">Job Description</Label>
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="description">Job Description</Label>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={improveDescription}
+                    disabled={improvingDescription || !description.trim()}
+                    className="flex items-center gap-1"
+                  >
+                    <Wand2 className="h-4 w-4" />
+                    {improvingDescription ? "Improving..." : "Improve with AI"}
+                  </Button>
+                </div>
                 <Textarea
                   id="description"
                   value={description}
@@ -180,7 +232,7 @@ const PostJob = () => {
                   required
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="requirements">Requirements</Label>
                 <Textarea
