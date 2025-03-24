@@ -7,13 +7,16 @@ import { Plus, Building, Briefcase, Users } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import ApplicationsTable from "@/components/ApplicationsTable";
 import CompanyProfileForm from "@/components/CompanyProfileForm";
+import JobListingsTable from "@/components/JobListingsTable";
 import { supabase } from "@/integrations/supabase/client";
-import { JobApplication, Company } from "@/lib/types";
+import { JobApplication, Company, Job } from "@/lib/types";
 import { getCompanyApplications } from "@/services/applicationService";
-import { fetchCompanyById } from "@/services/supabaseService";
+import { fetchCompanyById, fetchJobsByCompany, deleteJob } from "@/services/supabaseService";
+import { toast } from "sonner";
 
 const Dashboard = () => {
   const [applications, setApplications] = useState<JobApplication[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [company, setCompany] = useState<Company | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,6 +51,12 @@ const Dashboard = () => {
         console.log("Company data loaded:", companyData);
         setCompany(companyData);
         
+        // Load jobs for this company
+        console.log("Loading jobs for company ID:", userId);
+        const jobsData = await fetchJobsByCompany(userId);
+        console.log("Jobs loaded:", jobsData);
+        setJobs(jobsData);
+        
         setError(null);
       } catch (err) {
         console.error("Failed to fetch data:", err);
@@ -74,11 +83,31 @@ const Dashboard = () => {
       const companyData = await fetchCompanyById(userId);
       setCompany(companyData);
       
+      // Refresh jobs
+      const jobsData = await fetchJobsByCompany(userId);
+      setJobs(jobsData);
+      
       setError(null);
     } catch (err) {
       console.error("Failed to refresh data:", err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDeleteJob = async (jobId: string) => {
+    try {
+      await deleteJob(jobId);
+      toast.success("Job listing deleted successfully");
+      
+      // Refresh jobs list
+      if (userId) {
+        const jobsData = await fetchJobsByCompany(userId);
+        setJobs(jobsData);
+      }
+    } catch (err) {
+      console.error("Failed to delete job:", err);
+      toast.error("Failed to delete job listing. Please try again.");
     }
   };
 
@@ -144,24 +173,30 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="jobs">
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-border/50">
+            <div className="space-y-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-medium">My Jobs</h2>
+                <h2 className="text-xl font-medium">My Job Listings</h2>
                 <Button onClick={() => navigate("/post-job")}>
                   <Plus className="mr-2 h-4 w-4" />
                   Post a New Job
                 </Button>
               </div>
               
-              <div className="text-center py-8">
-                <h3 className="text-lg font-medium mb-2">Manage Your Job Listings</h3>
-                <p className="text-muted-foreground mb-6">
-                  View, edit, and track applications for your job postings
-                </p>
-                <Button asChild>
-                  <a href="/post-job">Post a New Job</a>
-                </Button>
-              </div>
+              {isLoading ? (
+                <div className="grid gap-4">
+                  {[...Array(2)].map((_, index) => (
+                    <div 
+                      key={index} 
+                      className="h-16 rounded-xl bg-gray-100 animate-pulse"
+                    />
+                  ))}
+                </div>
+              ) : (
+                <JobListingsTable 
+                  jobs={jobs} 
+                  onDelete={handleDeleteJob}
+                />
+              )}
             </div>
           </TabsContent>
 
