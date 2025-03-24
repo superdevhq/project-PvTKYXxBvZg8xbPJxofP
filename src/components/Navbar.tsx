@@ -18,17 +18,17 @@ const Navbar = () => {
       console.log("Auth session check:", !!data.session);
       setIsLoggedIn(!!data.session);
     };
-    
+
     checkAuth();
   }, [location.pathname]);
-  
+
   // Listen for auth state changes
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state change:", event, !!session);
       setIsLoggedIn(!!session);
     });
-    
+
     return () => {
       authListener.subscription.unsubscribe();
     };
@@ -91,6 +91,11 @@ const Navbar = () => {
           <Link to="/companies" className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground">
             Companies
           </Link>
+          {isLoggedIn && (
+            <Link to="/my-applications" className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground">
+              My Applications
+            </Link>
+          )}
         </nav>
 
         {/* Desktop buttons */}
@@ -135,6 +140,15 @@ const Navbar = () => {
               >
                 Companies
               </Link>
+              {isLoggedIn && (
+                <Link 
+                  to="/my-applications" 
+                  className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  My Applications
+                </Link>
+              )}
             </nav>
 
             <div className="flex flex-col gap-2 mt-2">
