@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
 
   try {
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    
+
     // Get the JWT from the request
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
@@ -42,11 +42,11 @@ Deno.serve(async (req) => {
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
-    
+
     // Verify the JWT
     const token = authHeader.replace('Bearer ', '')
     const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-    
+
     if (authError || !user) {
       return new Response(
         JSON.stringify({ error: 'Invalid token' }),
@@ -152,7 +152,7 @@ Deno.serve(async (req) => {
     } else if (applicationType === 'status-change') {
       // Email to candidate about status change
       let statusMessage = ''
-      
+
       switch (newStatus) {
         case 'reviewed':
           statusMessage = 'Your application has been reviewed by the hiring team.'
@@ -202,7 +202,7 @@ Deno.serve(async (req) => {
     // Send emails using Resend API
     const emails = [candidateEmail]
     if (companyEmail_) emails.push(companyEmail_)
-    
+
     const results = await Promise.all(emails.map(async (email) => {
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -217,7 +217,7 @@ Deno.serve(async (req) => {
           html: email.html
         })
       })
-      
+
       return await response.json()
     }))
 
