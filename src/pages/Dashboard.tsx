@@ -19,6 +19,7 @@ const Dashboard = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("applications");
   const navigate = useNavigate();
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -29,6 +30,7 @@ const Dashboard = () => {
         return;
       }
 
+      setUserId(data.session.user.id);
       loadData(data.session.user.id);
     };
 
@@ -41,7 +43,9 @@ const Dashboard = () => {
         setApplications(applicationsData);
         
         // Load company profile using the user's ID as the company ID
+        console.log("Loading company profile for user ID:", userId);
         const companyData = await fetchCompanyById(userId);
+        console.log("Company data loaded:", companyData);
         setCompany(companyData);
         
         setError(null);
@@ -57,19 +61,17 @@ const Dashboard = () => {
   }, [navigate]);
 
   const handleRefreshData = async () => {
+    if (!userId) return;
+    
     try {
       setIsLoading(true);
-      
-      // Get current user
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
       
       // Refresh applications
       const applicationsData = await getCompanyApplications();
       setApplications(applicationsData);
       
       // Refresh company profile
-      const companyData = await fetchCompanyById(session.user.id);
+      const companyData = await fetchCompanyById(userId);
       setCompany(companyData);
       
       setError(null);
@@ -173,7 +175,7 @@ const Dashboard = () => {
                   <div className="h-32 bg-gray-200 rounded"></div>
                 </div>
               ) : (
-                <CompanyProfileForm onSave={handleRefreshData} />
+                <CompanyProfileForm userId={userId} onSave={handleRefreshData} />
               )}
             </div>
           </TabsContent>
