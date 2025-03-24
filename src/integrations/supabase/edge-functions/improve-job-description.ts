@@ -1,7 +1,11 @@
 
-import { corsHeaders } from '../_shared/cors.ts'
-
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+}
 
 interface RequestBody {
   description: string;
