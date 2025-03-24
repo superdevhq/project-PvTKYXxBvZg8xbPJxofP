@@ -45,11 +45,12 @@ const CompanyProfileForm = ({ onSave }: CompanyProfileFormProps) => {
           return;
         }
         
-        // For now, we'll use a mock company ID (in a real app, this would come from the user's profile)
-        // In a production app, you would store the company_id in the user's metadata or in a separate table
-        const companyId = "apple"; // This is just for demo purposes
+        // Use the user's ID as the company ID
+        const userId = session.user.id;
+        console.log("Loading company data for user ID:", userId);
         
-        const companyData = await fetchCompanyById(companyId);
+        const companyData = await fetchCompanyById(userId);
+        console.log("Company data loaded:", companyData);
         
         if (companyData) {
           setCompany(companyData);

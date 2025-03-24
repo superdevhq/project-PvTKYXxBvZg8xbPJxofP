@@ -29,10 +29,10 @@ const Dashboard = () => {
         return;
       }
 
-      loadData();
+      loadData(data.session.user.id);
     };
 
-    const loadData = async () => {
+    const loadData = async (userId: string) => {
       try {
         setIsLoading(true);
         
@@ -40,11 +40,8 @@ const Dashboard = () => {
         const applicationsData = await getCompanyApplications();
         setApplications(applicationsData);
         
-        // Load company profile
-        // In a real app, this would come from the user's profile or a company_users table
-        // For now, we're using a fixed company ID for demonstration
-        const companyId = "apple"; // This is just for demo purposes
-        const companyData = await fetchCompanyById(companyId);
+        // Load company profile using the user's ID as the company ID
+        const companyData = await fetchCompanyById(userId);
         setCompany(companyData);
         
         setError(null);
@@ -63,15 +60,17 @@ const Dashboard = () => {
     try {
       setIsLoading(true);
       
+      // Get current user
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      
       // Refresh applications
       const applicationsData = await getCompanyApplications();
       setApplications(applicationsData);
       
       // Refresh company profile
-      if (company) {
-        const companyData = await fetchCompanyById(company.id);
-        setCompany(companyData);
-      }
+      const companyData = await fetchCompanyById(session.user.id);
+      setCompany(companyData);
       
       setError(null);
     } catch (err) {
