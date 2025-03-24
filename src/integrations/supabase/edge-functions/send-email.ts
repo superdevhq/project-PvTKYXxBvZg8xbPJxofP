@@ -203,29 +203,41 @@ Deno.serve(async (req) => {
     const emails = [candidateEmail]
     if (companyEmail_) emails.push(companyEmail_)
 
-    const results = await Promise.all(emails.map(async (email) => {
-      const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${RESEND_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          from: email.from || 'JobBoard <no-reply@updates.trytadam.com>',
-          to: email.to,
-          subject: email.subject,
-          html: email.html
-        })
-      })
+    // Add debugging
+    console.log("Sending emails to Resend API:", emails);
+    console.log("Using Resend API Key (first 4 chars):", RESEND_API_KEY.substring(0, 4) + "...");
 
-      return await response.json()
-    }))
+    const results = await Promise.all(emails.map(async (email) => {
+      try {
+        const response = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${RESEND_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            from: email.from || 'JobBoard <no-reply@updates.trytadam.com>',
+            to: email.to,
+            subject: email.subject,
+            html: email.html
+          })
+        });
+        
+        const responseData = await response.json();
+        console.log("Resend API response:", responseData);
+        return responseData;
+      } catch (error) {
+        console.error("Error sending email via Resend:", error);
+        return { error: error.message };
+      }
+    }));
 
     return new Response(
       JSON.stringify({ success: true, results }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
+    console.error("Edge function error:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
