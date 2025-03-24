@@ -127,7 +127,7 @@ Deno.serve(async (req) => {
             <p>The ${application.jobs.company} Team</p>
           </div>
         `,
-        from: `${company.name} <no-reply@updates.trytadam.com>`
+        from: `${company.name} <onboarding@resend.dev>`
       }
 
       // Email to company
@@ -147,7 +147,7 @@ Deno.serve(async (req) => {
             <p>You can review this application in your dashboard.</p>
           </div>
         `,
-        from: 'JobBoard <no-reply@updates.trytadam.com>'
+        from: 'JobBoard <onboarding@resend.dev>'
       }
     } else if (applicationType === 'status-change') {
       // Email to candidate about status change
@@ -190,7 +190,7 @@ Deno.serve(async (req) => {
             <p>The ${application.jobs.company} Team</p>
           </div>
         `,
-        from: `${company.name} <no-reply@updates.trytadam.com>`
+        from: `${company.name} <onboarding@resend.dev>`
       }
     } else {
       return new Response(
@@ -216,7 +216,7 @@ Deno.serve(async (req) => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            from: email.from || 'JobBoard <no-reply@updates.trytadam.com>',
+            from: email.from || 'JobBoard <onboarding@resend.dev>',
             to: email.to,
             subject: email.subject,
             html: email.html
